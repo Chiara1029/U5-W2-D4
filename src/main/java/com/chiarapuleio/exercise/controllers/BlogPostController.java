@@ -1,10 +1,14 @@
 package com.chiarapuleio.exercise.controllers;
 
 import com.chiarapuleio.exercise.entities.BlogPost;
+import com.chiarapuleio.exercise.exceptions.BadRequestException;
+import com.chiarapuleio.exercise.payloads.BlogPostDTO;
 import com.chiarapuleio.exercise.services.BlogPostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -29,7 +33,10 @@ public class BlogPostController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public BlogPost savePost(@RequestBody BlogPost newPost) {
+    public BlogPost savePost(@RequestBody @Validated BlogPostDTO newPost, BindingResult validation) {
+        if(validation.hasErrors()){
+            throw new BadRequestException(validation.getAllErrors());
+        }
         return this.bpSrv.saveBlogPost(newPost);
     }
 
